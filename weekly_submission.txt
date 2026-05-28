@@ -1,0 +1,21 @@
+Week 1
+1. I imported the customer churn dataset from Kaggle into my Visual Studio Code.
+2. Explored the shape of the dataset, the columns with their data types
+3. Checking for missing data.
+4. Finding the customer churn rate and visualizing it on a pie chart
+
+Week 2
+1. Checked for missing values
+2. Checked for duplicates
+3. Encoded both the dependent and target columns, ready for model training
+4. Perfomed feature engineering
+
+Week 3
+1. Split the data into training and testing data
+2. Trained the model on Logistics Regression, Random Forest, and Gradient Boosting.
+3.Compared the performance of the 3 models using accuracy, F1, and ROC
+
+Week 4
+1. Performed hyperparameter tuning using GridSearchCV on Gradient boosting found the best parameters, CV AUC
+2. Performed feature importance to see which colums were most influential in training the model
+3. Exported the best gradient boosting model
