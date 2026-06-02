@@ -9,11 +9,10 @@ from sklearn.preprocessing import LabelEncoder
 def load_artifacts():
     model = joblib.load("model.pkl")
     scaler = joblib.load("scaler.pkl")
-    imputer = joblib.load("imputer.pkl")
     encoders = joblib.load("encoders_dict.pkl")
-    return model, scaler, imputer, encoders
+    return model, scaler, encoders
 
-model, scaler, imputer, encoders = load_artifacts()
+model, scaler, encoders = load_artifacts()
 #--- Page Configuration ---
 st.set_page_config(page_title="Customer churn predictor", layout= "centered")
 
@@ -89,32 +88,48 @@ input_data = {
     }
 
 user_df = pd.DataFrame([input_data])
-
 # 1. Apply Label Encoding mapped to the dictionary
 for col, le in encoders.items():
     if col in user_df.columns:
-        # Handle potential unseen labels gracefully, though the UI constrains them
-        user_df[col] = le.transform(user_df[col])
+        try:
+            # Try to encode normally
+            user_df[col] = le.transform(user_df[col])
+        except ValueError:
+            # Safety net: If the notebook encoder saved '1' as a string instead of an integer, 
+            # this catches the error, converts the Streamlit input to a string, and encodes it perfectly.
+            user_df[col] = le.transform(user_df[col].astype(str))
+if st.button("Predict Churn Risk", type="primary"):
+    user_df = pd.DataFrame([input_data])
 
-# 2. Simple Imputer (Median)
-user_df_imputed = pd.DataFrame(imputer.transform(user_df), columns=user_df.columns)
-    
-# 3. Standard Scaler
-user_df_scaled = pd.DataFrame(scaler.transform(user_df_imputed), columns=user_df.columns)
-    
-# 4. Model Prediction
-churn_probability = model.predict_proba(user_df_scaled)[0][1]
+    # 1. Apply Label Encoding mapped to the dictionary
+    for col, le in encoders.items():
+        if col in user_df.columns:
+            try:
+                # Try to encode normally
+                user_df[col] = le.transform(user_df[col])
+            except ValueError:
+                # Safety net for integer/string mismatches
+                user_df[col] = le.transform(user_df[col].astype(str))
 
-# --- Display Output ---
-st.subheader("Prediction Results")
-    
-# Using 0.5 as the default threshold for a binary classification
-if churn_probability > 0.5:
-    st.error(f"High Risk of Churn! (Probability: {churn_probability:.1%})")
-    st.write("Recommendation: This profile shares heavy characteristics with churners. Consider targeted promotional discounts.")
-else:
-    st.success(f"Low Risk of Churn. (Probability: {churn_probability:.1%})")
-    st.write("This customer is likely to stay.")
+    # --- Sweep for skipped binary columns ---
+    user_df = user_df.replace({"Yes": 1, "No": 0})
 
+    # 2. Enforce Column Order (using the scaler to align with the training data)
+    user_df = user_df[scaler.feature_names_in_]
 
-print("Known classes:", le.classes_)
+    # 3. Standard Scaler
+    user_df_scaled = pd.DataFrame(scaler.transform(user_df), columns=user_df.columns)
+        
+    # 4. Model Prediction
+    churn_probability = model.predict_proba(user_df_scaled)[0][1]
+
+    # --- Display Output ---
+    st.subheader("Prediction Results")
+        
+    # Using 0.5 as the default threshold for a binary classification
+    if churn_probability > 0.5:
+        st.error(f"High Risk of Churn! (Probability: {churn_probability:.1%})")
+        st.write("Recommendation: This profile shares heavy characteristics with churners. Consider targeted promotional discounts.")
+    else:
+        st.success(f"Low Risk of Churn. (Probability: {churn_probability:.1%})")
+        st.write("This customer is likely to stay.")
