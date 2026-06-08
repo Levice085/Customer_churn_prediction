@@ -19,3 +19,17 @@ Week 4
 1. Performed hyperparameter tuning using GridSearchCV on Gradient boosting found the best parameters, CV AUC
 2. Performed feature importance to see which colums were most influential in training the model
 3. Exported the best gradient boosting model
+
+Week 5
+1. Built a web application using streamit.
+2. Web_app.py was the main Streamlit application script containing the UI and prediction logic.
+3. Imported the artifacts which included model.pkl, encoder_dict.pkl and scaler.pkl
+4. Loaded the requirements.txt file with the necessary packages so as to deploy from github
+
+What did you build? (3–5 sentences)
+1. I built a web application that can predict whether a customer is likely to churn from the telecommunications company.
+2. The app predicts the percentage probability of the customer churning and gives recommendations 
+3. The app enables the company to impute the customer's details and give a prediction
+
+Biggest challenge you solved
+Deploying my model from my local PC to a web application that can be publicly seen via Streamlit.
