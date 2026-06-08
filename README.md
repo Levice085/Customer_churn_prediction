@@ -29,5 +29,5 @@ The project features a complete end-to-end pipeline:
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/Levice085/Customer_churn_prediction.git
    cd <your-repository-directory>
